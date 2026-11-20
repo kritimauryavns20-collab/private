@@ -1,0 +1,307 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anju's Magical Adventure ✨</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;color:white;
+ font-family:Georgia,serif;text-align:center;
+ background:radial-gradient(circle at top,#514078,#211c42 55%,#100e25);
+}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;color:white;animation:twinkle 2s infinite alternate}
+@keyframes twinkle{to{opacity:.2;transform:scale(.5)}}
+main{position:relative;z-index:1;max-width:850px;margin:auto;padding:35px 18px}
+.page{display:none;min-height:85vh;flex-direction:column;align-items:center;justify-content:center}
+.page.active{display:flex;animation:fade .6s}
+@keyframes fade{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(2.2rem,7vw,4rem);color:#ffd9f1;text-shadow:0 0 20px #f4a5e0}
+h2{color:#ffdbf2}
+p{font-size:1.1rem;line-height:1.7;max-width:650px;color:#eee4ff}
+button{
+ border:1px solid #ffffff66;border-radius:30px;padding:13px 23px;
+ background:linear-gradient(130deg,#d87fbc,#8069cb);
+ color:white;font-size:1rem;cursor:pointer;margin:8px;
+ transition:.2s;
+}
+button:hover{transform:scale(1.07);box-shadow:0 0 20px #eaa4ec}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.big{font-size:5rem;cursor:pointer;animation:float 3s infinite}
+@keyframes float{50%{transform:translateY(-12px)}}
+.panel{
+ background:#ffffff13;border:1px solid #ffffff55;
+ border-radius:22px;padding:25px;width:min(100%,650px);
+ backdrop-filter:blur(8px);margin:15px auto;
+}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:min(100%,430px)}
+.tile{font-size:2.3rem;min-height:85px;border-radius:15px;background:#ffffff20}
+.tile.found{background:#e8b8e633}
+.options{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.options button{min-width:120px}
+#feedback{min-height:35px;color:#ffe0a9}
+.worlds{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:15px;width:100%;margin:15px 0}
+.world{background:#ffffff16;border:1px solid #ffffff55;border-radius:20px;padding:18px;cursor:pointer}
+.world:hover{background:#ffffff30;transform:translateY(-5px)}
+.world span{font-size:3rem}
+.world h3{color:#ffdbf2}
+.world p{font-size:.95rem}
+#progress{position:fixed;top:12px;right:14px;z-index:3;background:#ffffff22;padding:9px 15px;border-radius:20px}
+.letter{background:#fff0f5;color:#49334e;padding:30px;border-radius:20px;max-width:620px;line-height:1.8}
+.letter p{color:#49334e}
+@media(max-width:500px){main{padding:25px 12px}.tile{min-height:70px}}
+</style>
+</head>
+
+<body>
+<div id="stars"></div>
+<div id="progress">⭐ 0 / 3</div>
+
+<main>
+
+<!-- WELCOME -->
+<section class="page active" id="p1">
+ <div class="big">🌙✨</div>
+ <p>A secret invitation has arrived...</p>
+ <h1>Anju's Magical Adventure</h1>
+ <p>A little universe, a few mysteries and a whole lot of magic.</p>
+ <button onclick="show(2)">Begin the adventure →</button>
+</section>
+
+<!-- CAKE -->
+<section class="page" id="p2">
+ <p>LEVEL 1 · THE BIRTHDAY MAGIC</p>
+ <h1>Happy Birthday, Anju! 🎂</h1>
+ <div class="big">🎂</div>
+ <p>Three candles are waiting. Tap each one to make a wish!</p>
+ <div class="options" id="candles">
+  <button onclick="blow(0)">🕯️ Candle 1</button>
+  <button onclick="blow(1)">🕯️ Candle 2</button>
+  <button onclick="blow(2)">🕯️ Candle 3</button>
+ </div>
+ <p id="candleText">Candles left: 3</p>
+ <button id="cakeNext" disabled onclick="show(3)">Next level →</button>
+</section>
+
+<!-- KEY HUNT -->
+<section class="page" id="p3">
+ <p>LEVEL 2 · THE HIDDEN KEY</p>
+ <h1>Find the Magic Key 🔑</h1>
+ <p>A magical door is locked. Somewhere among these mysterious boxes is its key. Tap to investigate!</p>
+ <div class="grid" id="keyGrid"></div>
+ <p id="keyText">One of these boxes hides the key...</p>
+ <button id="keyNext" disabled onclick="show(4)">I found it! Open the door →</button>
+</section>
+
+<!-- RIDDLE -->
+<section class="page" id="p4">
+ <p>LEVEL 3 · THE MAGIC DOOR</p>
+ <h1>One Last Mystery 🚪</h1>
+ <div class="big">🔮</div>
+ <div class="panel">
+  <h2>Riddle of the Door</h2>
+  <p>I have no wings, yet I can take you anywhere.<br>
+  I have no voice, yet I can tell stories.<br>
+  I begin in your mind and can change your world.<br>
+  What am I?</p>
+  <div class="options">
+   <button onclick="answer('dream')">A dream</button>
+   <button onclick="answer('book')">A book</button>
+   <button onclick="answer('cloud')">A cloud</button>
+  </div>
+  <p id="riddleText"></p>
+ </div>
+ <button id="doorNext" disabled onclick="show(5)">Enter the dream worlds ✨</button>
+</section>
+
+<!-- WORLDS -->
+<section class="page" id="p5">
+ <p>LEVEL 4 · EXPLORE THE UNIVERSE</p>
+ <h1>Choose Your Dream World 🌌</h1>
+ <p>Complete all three little missions to collect the magical stars.</p>
+ <div class="worlds">
+  <div class="world" onclick="mission('sky')">
+   <span>☁️</span><h3>Cloud Kingdom</h3>
+   <p>A world above the clouds.</p>
+   <p id="skyStatus">Not explored</p>
+  </div>
+  <div class="world" onclick="mission('ocean')">
+   <span>🌊</span><h3>Ocean of Dreams</h3>
+   <p>A secret beneath the waves.</p>
+   <p id="oceanStatus">Not explored</p>
+  </div>
+  <div class="world" onclick="mission('forest')">
+   <span>🌳</span><h3>Enchanted Forest</h3>
+   <p>A forest full of secrets.</p>
+   <p id="forestStatus">Not explored</p>
+  </div>
+ </div>
+ <p id="worldFeedback">Choose a world to begin its mission.</p>
+ <button id="treasureNext" disabled onclick="show(6)">Unlock the treasure chest →</button>
+</section>
+
+<!-- TREASURE -->
+<section class="page" id="p6">
+ <p>FINAL LEVEL · THE TREASURE</p>
+ <h1>You did it, Anju! 🎉</h1>
+ <div class="big" onclick="openTreasure()">🎁</div>
+ <p>You've collected all three magical stars. Tap the gift to discover your reward!</p>
+ <button onclick="openTreasure()">Open your present 🎁</button>
+ <div id="giftMessage"></div>
+</section>
+
+<!-- LETTER -->
+<section class="page" id="p7">
+ <div class="big">💌</div>
+ <h1>A Letter for You</h1>
+ <div class="letter">
+  <h2>Dear Anju,</h2>
+  <p>
+   I hope this new year of your life brings you unexpected adventures,
+   beautiful places, endless laughter and dreams that slowly become reality.
+  </p>
+  <p>
+   I hope you never stop exploring, never stop being curious,
+   and never forget how much happiness you deserve.
+  </p>
+  <p>
+   May you always find magic in ordinary days and courage in difficult moments.
+   The universe is enormous, and there are so many beautiful things waiting for you.
+  </p>
+  <h2>Happy Birthday! ❤️</h2>
+  <p>With lots of love ✨</p>
+ </div>
+ <button onclick="show(1)">Play again ↻</button>
+</section>
+
+</main>
+
+<script>
+// Starry background
+for(let i=0;i<65;i++){
+ let s=document.createElement("span");
+ s.className="star";s.textContent="✦";
+ s.style.left=Math.random()*100+"%";
+ s.style.top=Math.random()*100+"%";
+ s.style.fontSize=(6+Math.random()*12)+"px";
+ s.style.animationDelay=Math.random()*3+"s";
+ document.getElementById("stars").appendChild(s);
+}
+
+function show(n){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ document.getElementById("p"+n).classList.add("active");
+ window.scrollTo(0,0);
+}
+
+// Candles
+let blown=new Set();
+function blow(n){
+ if(blown.has(n))return;
+ blown.add(n);
+ let buttons=document.querySelectorAll("#candles button");
+ buttons[n].textContent="💨";
+ buttons[n].disabled=true;
+ document.getElementById("candleText").textContent="Candles left: "+(3-blown.size);
+ if(blown.size===3){
+  document.getElementById("candleText").textContent="All wishes sent to the universe! 🌠";
+  document.getElementById("cakeNext").disabled=false;
+ }
+}
+
+// Key hunt
+let keyPosition=Math.floor(Math.random()*9);
+let found=false;
+const grid=document.getElementById("keyGrid");
+for(let i=0;i<9;i++){
+ let b=document.createElement("button");
+ b.className="tile";b.textContent="❔";
+ b.onclick=()=>{
+  if(b.disabled||found)return;
+  if(i===keyPosition){
+   b.textContent="🔑";b.classList.add("found");
+   found=true;
+   document.getElementById("keyText").textContent="You found the magical key! ✨";
+   document.getElementById("keyNext").disabled=false;
+  }else{
+   b.textContent="🌟";b.disabled=true;
+   document.getElementById("keyText").textContent="Not here! Keep searching...";
+  }
+ };
+ grid.appendChild(b);
+}
+
+// Riddle
+function answer(choice){
+ const text=document.getElementById("riddleText");
+ if(choice==="dream"){
+  text.textContent="Correct! A dream can take you anywhere. The door is opening! ✨";
+  document.getElementById("doorNext").disabled=false;
+ }else{
+  text.textContent="Not quite! Think of something that lives in your imagination. 💭";
+ }
+}
+
+// Dream missions
+const completed=new Set();
+const missions={
+ sky:{
+  question:"What can fly without wings?",
+  options:["A dream","A stone","A chair"],
+  correct:"A dream",
+  success:"The clouds part and reveal a beautiful rainbow! 🌈"
+ },
+ ocean:{
+  question:"What shines in the night sky and reflects on the ocean?",
+  options:["The stars","A mountain","A flower"],
+  correct:"The stars",
+  success:"The ocean glows with a thousand stars! 🌊"
+ },
+ forest:{
+  question:"What do you need to grow a magical garden?",
+  options:["Kindness","A television","A suitcase"],
+  correct:"Kindness",
+  success:"The flowers bloom and the forest lights up! 🌸"
+ }
+};
+
+function mission(name){
+ const m=missions[name];
+ const feedback=document.getElementById("worldFeedback");
+ if(completed.has(name)){
+  feedback.textContent="You've already completed this world! ⭐";
+  return;
+ }
+ let choice=prompt(m.question+"\n\n1. "+m.options[0]+"\n2. "+m.options[1]+"\n3. "+m.options[2]+"\n\nType 1, 2 or 3:");
+ if(choice===null)return;
+ let index=Number(choice)-1;
+ if(index<0||index>2||!Number.isInteger(index)){
+  feedback.textContent="Choose 1, 2 or 3 to try again!";
+  return;
+ }
+ if(m.options[index]===m.correct){
+  completed.add(name);
+  document.getElementById(name+"Status").textContent="⭐ Completed!";
+  feedback.textContent=m.success;
+  document.getElementById("progress").textContent="⭐ "+completed.size+" / 3";
+  if(completed.size===3){
+   document.getElementById("treasureNext").disabled=false;
+   feedback.textContent="All three worlds explored! The treasure is yours! 🎉";
+  }
+ }else{
+  feedback.textContent="Almost! Try exploring this world again. 💫";
+ }
+}
+
+// Treasure
+function openTreasure(){
+ document.getElementById("giftMessage").innerHTML=
+ '<div class="panel"><div class="big">💖</div><h2>Your greatest treasure is the adventure ahead of you.</h2><p>And this little universe is always yours.</p><button onclick="show(7)">Read your birthday letter 💌</button></div>';
+}
+</script>
+</body>
+</html>
